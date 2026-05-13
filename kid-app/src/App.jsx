@@ -261,6 +261,12 @@ useEffect(() => {
     const res =await axios.post("https://kidsgame-2.onrender.com/speak", {
       text,
     });
+    const audio = new Audio(res.data.audio);
+
+audio.muted = false;
+audio.playsInline = true;
+
+audio.load();
 
     const audio = new Audio(res.data.audio);
 
@@ -387,15 +393,11 @@ const startListening = () => {
 };
   // ▶ START GAME
   const startGame = () => {
-
-    setStarted(true);
-
-    speechSynthesis.getVoices();
-
-
-
-    const startGame = () => {
   setStarted(true);
+
+  // 👇 IMPORTANT user interaction unlock
+  const audioUnlock = new Audio();
+  audioUnlock.play().catch(() => {});
 
   setTimeout(() => {
     speak("🎮 Welcome childrens! चला मजा करूया!", () => {
@@ -408,7 +410,6 @@ const startListening = () => {
     });
   }, 500);
 };
-  
 
   // 🔁 NEXT QUESTION
   useEffect(() => {
