@@ -256,17 +256,15 @@ useEffect(() => {
   }
 }, [micOn]);
   // 🔊 SPEAK FUNCTION
-const speak = async (text, cb) => {
+ const speak = async (text, cb) => {
   try {
-    const res = await axios.post("https://kidsgame-2.onrender.com/speak", {
+    const res =await axios.post("https://kidsgame-2.onrender.com/speak",  {
       text,
     });
 
     const audio = new Audio(res.data.audio);
 
-    audio.muted = false;
-    audio.playsInline = true;
-    audio.crossOrigin = "anonymous";
+    audio.load(); // 🔥 important fix
 
     const playPromise = audio.play();
 
@@ -288,9 +286,6 @@ const speak = async (text, cb) => {
     console.log("TTS ERROR:", err.message);
   }
 };
-
-
-
   // 🎤 START LISTENING
   // const startListening = () => {
 
@@ -391,27 +386,31 @@ const startListening = () => {
 };
 };
   // ▶ START GAME
- const startGame = async () => {
-  setStarted(true);
+  const startGame = () => {
 
-  try {
-    const unlockAudio = new Audio(
-      "https://www.soundjay.com/buttons/sounds/button-1.mp3"
+    setStarted(true);
+
+    speechSynthesis.getVoices();
+
+    speak(
+      "🎮 Welcome childrens! चला मजा करूया!",
+      () => {
+
+        setTimeout(() => {
+
+          speak(q.speak, () => {
+
+            lockRef.current = false;
+
+            startListening();
+
+          });
+
+        }, 1200);
+
+      }
     );
-    await unlockAudio.play();
-  } catch (e) {}
-
-  setTimeout(() => {
-    speak("🎮 Welcome childrens! चला मजा करूया!", () => {
-      setTimeout(() => {
-        speak(q.speak, () => {
-          lockRef.current = false;
-          startListening();
-        });
-      }, 1200);
-    });
-  }, 500);
-};
+  };
 
   // 🔁 NEXT QUESTION
   useEffect(() => {
