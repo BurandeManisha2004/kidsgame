@@ -392,25 +392,23 @@ const startListening = () => {
 
     speechSynthesis.getVoices();
 
-    speak(
-      "🎮 Welcome childrens! चला मजा करूया!",
-      () => {
 
-        setTimeout(() => {
 
-          speak(q.speak, () => {
+    const startGame = () => {
+  setStarted(true);
 
-            lockRef.current = false;
-
-            startListening();
-
-          });
-
-        }, 1200);
-
-      }
-    );
-  };
+  setTimeout(() => {
+    speak("🎮 Welcome childrens! चला मजा करूया!", () => {
+      setTimeout(() => {
+        speak(q.speak, () => {
+          lockRef.current = false;
+          startListening();
+        });
+      }, 1200);
+    });
+  }, 500);
+};
+  
 
   // 🔁 NEXT QUESTION
   useEffect(() => {
