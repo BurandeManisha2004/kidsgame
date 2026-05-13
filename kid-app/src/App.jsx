@@ -258,7 +258,7 @@ useEffect(() => {
   // 🔊 SPEAK FUNCTION
  const speak = async (text, cb) => {
   try {
-    const res = await axios.post("http://127.0.0.1:8000/speak", {
+    const res =await axios.post("https://kidsgame-2.onrender.com/speak", {
       text,
     });
 
