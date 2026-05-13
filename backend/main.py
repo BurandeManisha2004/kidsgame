@@ -1,9 +1,9 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import edge_tts
 import uuid
-import os
 from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
@@ -19,7 +19,7 @@ app.add_middleware(
 class Req(BaseModel):
     text: str
 
-# ✅ FIXED PATH
+# ✅ ABSOLUTE PATH FIX
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 AUDIO_DIR = os.path.join(BASE_DIR, "audio")
 
@@ -29,9 +29,10 @@ BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:8000")
 
 @app.post("/speak")
 async def speak(req: Req):
-
     file_name = f"{uuid.uuid4().hex}.mp3"
     file_path = os.path.join(AUDIO_DIR, file_name)
+
+    print("Saving to:", file_path)  # DEBUG
 
     communicate = edge_tts.Communicate(
         req.text,
@@ -43,7 +44,11 @@ async def speak(req: Req):
 
     await communicate.save(file_path)
 
+    # ✅ CHECK FILE EXISTS
+    if not os.path.exists(file_path):
+        return {"error": "file not created"}
+
     return {"audio": f"{BASE_URL}/audio/{file_name}"}
 
-# ✅ FIXED STATIC
+# ✅ STATIC FIX
 app.mount("/audio", StaticFiles(directory=AUDIO_DIR), name="audio")
