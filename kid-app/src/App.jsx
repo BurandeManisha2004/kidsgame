@@ -309,10 +309,32 @@ useEffect(() => {
 //   }
 // };
 
+// const speak = async (text, cb) => {
+//   try {
+//     const res = await axios.post(
+//       "https://kidsgame-4.onrender.com/",
+//       { text },
+//       { responseType: "blob" }
+//     );
+
+//     const audioUrl = URL.createObjectURL(res.data);
+//     const audio = new Audio(audioUrl);
+
+//     audio.play();
+
+//     audio.onended = () => {
+//       cb && cb();
+//     };
+
+//   } catch (err) {
+//     console.log("TTS ERROR:", err);
+//   }
+// };
+
 const speak = async (text, cb) => {
   try {
     const res = await axios.post(
-      "https://kidsgame-2.onrender.com/speak",
+      "https://kidsgame-4.onrender.com/",
       { text },
       { responseType: "blob" }
     );
@@ -320,9 +342,22 @@ const speak = async (text, cb) => {
     const audioUrl = URL.createObjectURL(res.data);
     const audio = new Audio(audioUrl);
 
-    audio.play();
+    audio.preload = "auto";
+
+    const playPromise = audio.play();
+
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          console.log("Audio playing");
+        })
+        .catch((err) => {
+          console.log("Audio blocked:", err);
+        });
+    }
 
     audio.onended = () => {
+      URL.revokeObjectURL(audioUrl); // 🔥 memory cleanup
       cb && cb();
     };
 
@@ -330,6 +365,7 @@ const speak = async (text, cb) => {
     console.log("TTS ERROR:", err);
   }
 };
+
 
   // 🎤 START LISTENING
   // const startListening = () => {
