@@ -3,11 +3,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import edge_tts
-import uuid
-from fastapi.staticfiles import StaticFiles
+import io
+from fastapi.responses import StreamingResponse
 
 app = FastAPI()
 
+# ---------------- CORS ----------------
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -16,39 +17,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ---------------- REQUEST MODEL ----------------
 class Req(BaseModel):
     text: str
 
-# ✅ ABSOLUTE PATH FIX
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-AUDIO_DIR = os.path.join(BASE_DIR, "audio")
 
-os.makedirs(AUDIO_DIR, exist_ok=True)
-
-BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:8000")
-
+# ---------------- TTS API (FIXED) ----------------
 @app.post("/speak")
 async def speak(req: Req):
-    file_name = f"{uuid.uuid4().hex}.mp3"
-    file_path = os.path.join(AUDIO_DIR, file_name)
 
-    print("Saving to:", file_path)  # DEBUG
-
+    # Edge TTS setup
     communicate = edge_tts.Communicate(
         req.text,
-        "mr-IN-AarohiNeural",
+        "mr-IN-ManoharNeural",
         rate="+9%",
         pitch="+2Hz",
         volume="+20%"
     )
 
-    await communicate.save(file_path)
+    audio_stream = io.BytesIO()
 
-    # ✅ CHECK FILE EXISTS
-    if not os.path.exists(file_path):
-        return {"error": "file not created"}
+    # stream audio directly (NO FILE SAVE)
+    async for chunk in communicate.stream():
+        if chunk["type"] == "audio":
+            audio_stream.write(chunk["data"])
 
-    return {"audio": f"{BASE_URL}/audio/{file_name}"}
+    audio_stream.seek(0)
 
-# ✅ STATIC FIX
-app.mount("/audio", StaticFiles(directory=AUDIO_DIR), name="audio")
+    return StreamingResponse(audio_stream, media_type="audio/mpeg")

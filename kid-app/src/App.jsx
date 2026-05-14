@@ -256,36 +256,81 @@ useEffect(() => {
   }
 }, [micOn]);
   // 🔊 SPEAK FUNCTION
- const speak = async (text, cb) => {
+//  const speak = async (text, cb) => {
+//   try {
+//     const res =await axios.post("https://kidsgame-2.onrender.com/speak",  {
+//       text,
+//     });
+
+    // const audio = new Audio(res.data.audio);
+
+    // audio.load(); // 🔥 important fix
+
+    // const playPromise = audio.play();
+
+    // if (playPromise !== undefined) {
+    //   playPromise
+    //     .then(() => {
+    //       console.log("Audio playing");
+//         })
+//         .catch((err) => {
+//           console.log("Audio blocked:", err);
+//         });
+//     }
+
+//     audio.onended = () => {
+//       cb && cb();
+//     };
+
+//   } catch (err) {
+//     console.log("TTS ERROR:", err.message);
+//   }
+// };
+
+// const speak = async (text, cb) => {
+//   try {
+//     const res = await axios.post(
+//       "https://kidsgame-2.onrender.com/speak",
+//       { text },
+//       { responseType: "blob" }
+//     );
+
+//     const url = URL.createObjectURL(res.data);
+//     const audio = new Audio(url);
+
+//     audio.play();
+
+//     audio.onended = () => {
+//       cb && cb();
+//     };
+
+//   } catch (err) {
+//     console.log("TTS ERROR:", err);
+//   }
+// };
+
+const speak = async (text, cb) => {
   try {
-    const res =await axios.post("https://kidsgame-2.onrender.com/speak",  {
-      text,
-    });
+    const res = await axios.post(
+      "https://kidsgame-2.onrender.com/speak",
+      { text },
+      { responseType: "blob" }
+    );
 
-    const audio = new Audio(res.data.audio);
+    const audioUrl = URL.createObjectURL(res.data);
+    const audio = new Audio(audioUrl);
 
-    audio.load(); // 🔥 important fix
-
-    const playPromise = audio.play();
-
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          console.log("Audio playing");
-        })
-        .catch((err) => {
-          console.log("Audio blocked:", err);
-        });
-    }
+    audio.play();
 
     audio.onended = () => {
       cb && cb();
     };
 
   } catch (err) {
-    console.log("TTS ERROR:", err.message);
+    console.log("TTS ERROR:", err);
   }
 };
+
   // 🎤 START LISTENING
   // const startListening = () => {
 
