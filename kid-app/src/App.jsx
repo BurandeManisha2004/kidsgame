@@ -343,18 +343,15 @@ const speak = async (text, cb) => {
     const audio = new Audio(audioUrl);
 
     audio.preload = "auto";
-    audio.playsInline = true;
 
-    const playPromise = audio.play();
-
-    if (playPromise !== undefined) {
-      playPromise.catch((err) => {
-        console.log("Audio blocked:", err);
-      });
+    try {
+      await audio.play();
+    } catch (err) {
+      console.log("Autoplay blocked:", err);
     }
 
     audio.onended = () => {
-      URL.revokeObjectURL(audioUrl);
+      setTimeout(() => URL.revokeObjectURL(audioUrl), 500);
       cb && cb();
     };
 
