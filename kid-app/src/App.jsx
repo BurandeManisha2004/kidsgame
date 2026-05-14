@@ -334,7 +334,7 @@ useEffect(() => {
 const speak = async (text, cb) => {
   try {
     const res = await axios.post(
-      "https://kidsgame-4.onrender.com/",
+      "https://kidsgame-4.onrender.com/speak",
       { text },
       { responseType: "blob" }
     );
@@ -343,21 +343,18 @@ const speak = async (text, cb) => {
     const audio = new Audio(audioUrl);
 
     audio.preload = "auto";
+    audio.playsInline = true;
 
     const playPromise = audio.play();
 
     if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          console.log("Audio playing");
-        })
-        .catch((err) => {
-          console.log("Audio blocked:", err);
-        });
+      playPromise.catch((err) => {
+        console.log("Audio blocked:", err);
+      });
     }
 
     audio.onended = () => {
-      URL.revokeObjectURL(audioUrl); // 🔥 memory cleanup
+      URL.revokeObjectURL(audioUrl);
       cb && cb();
     };
 
@@ -365,7 +362,6 @@ const speak = async (text, cb) => {
     console.log("TTS ERROR:", err);
   }
 };
-
 
   // 🎤 START LISTENING
   // const startListening = () => {
